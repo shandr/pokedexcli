@@ -15,22 +15,23 @@ type cliCommand struct {
 
 var commands map[string]cliCommand
 
-func init() {
-	commands = map[string]cliCommand{
+func getCommands() map[string]cliCommand {
+	return map[string]cliCommand{
+		"help": {
+			name:        "help",
+			description: "Displays a help message",
+			callback:    commandHelp,
+		},
 		"exit": {
 			name:        "exit",
 			description: "Exit the Pokedex",
 			callback:    commandExit,
 		},
-		"help": {
-			name:        "help",
-			description: "List all available commands",
-			callback:    commandHelp,
-		},
 	}
 }
 
 func repl() {
+	fmt.Println("Welcome to the Pokedex!")
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
 		fmt.Print("Pokedex > ")
@@ -40,7 +41,7 @@ func repl() {
 			continue
 		}
 		command := cleanInput(text)
-		value, exist := commands[command]
+		value, exist := getCommands()[command]
 		if exist {
 			err := value.callback()
 			if err != nil {
@@ -49,6 +50,7 @@ func repl() {
 			continue
 		}
 		fmt.Println("Unknown command")
+		continue
 	}
 }
 
@@ -68,7 +70,7 @@ func commandExit() error {
 
 func commandHelp() error {
 	fmt.Println("Available commands:")
-	for _, value := range commands {
+	for _, value := range getCommands() {
 		fmt.Printf("  %s: %s\n", value.name, value.description)
 	}
 	return nil

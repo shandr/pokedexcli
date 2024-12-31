@@ -13,8 +13,6 @@ type cliCommand struct {
 	callback    func() error
 }
 
-var commands map[string]cliCommand
-
 func getCommands() map[string]cliCommand {
 	return map[string]cliCommand{
 		"help": {

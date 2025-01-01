@@ -14,7 +14,7 @@ type cliCommand struct {
 	callback    func(config *pokeapi.Config) error
 }
 
-func getCommands(config *pokeapi.Config) map[string]cliCommand {
+func getCommands() map[string]cliCommand {
 	return map[string]cliCommand{
 		"help": {
 			name:        "help",
@@ -50,7 +50,7 @@ func repl(config *pokeapi.Config) {
 			continue
 		}
 		command := cleanInput(text)
-		value, exist := getCommands(config)[command]
+		value, exist := getCommands()[command]
 		if exist {
 			err := value.callback(config)
 			if err != nil {
@@ -78,7 +78,7 @@ func commandExit(config *pokeapi.Config) error {
 
 func commandHelp(config *pokeapi.Config) error {
 	fmt.Println("Available commands:")
-	for _, value := range getCommands(config) {
+	for _, value := range getCommands() {
 		fmt.Printf("  %s: %s\n", value.name, value.description)
 	}
 	return nil

@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"github.com/shandr/pokedexcli/internal/pokeapi"
 	"os"
 	"strings"
 )
@@ -10,10 +11,10 @@ import (
 type cliCommand struct {
 	name        string
 	description string
-	callback    func() error
+	callback    func(config *pokeapi.Config) error
 }
 
-func getCommands() map[string]cliCommand {
+func getCommands(config *pokeapi.Config) map[string]cliCommand {
 	return map[string]cliCommand{
 		"help": {
 			name:        "help",
@@ -25,10 +26,20 @@ func getCommands() map[string]cliCommand {
 			description: "Exit the Pokedex",
 			callback:    commandExit,
 		},
+		"map": {
+			name:        "map",
+			description: "Get the location areas forward",
+			callback:    getMap,
+		},
+		"mapb": {
+			name:        "mapb",
+			description: "Get the location areas backward",
+			callback:    getMapBackward,
+		},
 	}
 }
 
-func repl() {
+func repl(config *pokeapi.Config) {
 	fmt.Println("Welcome to the Pokedex!")
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
@@ -39,9 +50,9 @@ func repl() {
 			continue
 		}
 		command := cleanInput(text)
-		value, exist := getCommands()[command]
+		value, exist := getCommands(config)[command]
 		if exist {
-			err := value.callback()
+			err := value.callback(config)
 			if err != nil {
 				fmt.Println("An error occurred:", err)
 			}
@@ -53,23 +64,46 @@ func repl() {
 }
 
 func cleanInput(text string) string {
-	output := strings.TrimSpace(text)
-	output = strings.ToLower(text)
-	words := strings.Fields(output)
-	commands := strings.Join(words, " ")
-	return commands
+	text = strings.TrimSpace(text)
+	text = strings.ToLower(text)
+	words := strings.Fields(text)
+	return strings.Join(words, " ")
 }
 
-func commandExit() error {
+func commandExit(config *pokeapi.Config) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
 	return nil
 }
 
-func commandHelp() error {
+func commandHelp(config *pokeapi.Config) error {
 	fmt.Println("Available commands:")
-	for _, value := range getCommands() {
+	for _, value := range getCommands(config) {
 		fmt.Printf("  %s: %s\n", value.name, value.description)
+	}
+	return nil
+}
+
+func getMap(config *pokeapi.Config) error {
+	locations, err := pokeapi.GetLocationAreas(config)
+	if err != nil {
+		fmt.Println("Error getting location areas", err)
+		return err
+	}
+	for _, location := range locations.Results {
+		fmt.Println(location.Name, location.URL)
+	}
+	return nil
+}
+
+func getMapBackward(config *pokeapi.Config) error {
+	locations, err := pokeapi.GetLocationAreasBackward(config)
+	if err != nil {
+		fmt.Println("Error getting location areas", err)
+		return err
+	}
+	for _, location := range locations.Results {
+		fmt.Println(location.Name, location.URL)
 	}
 	return nil
 }

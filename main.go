@@ -1,5 +1,10 @@
 package main
 
+import (
+	"github.com/shandr/pokedexcli/internal/pokeapi"
+)
+
 func main() {
-	repl()
+	config := &pokeapi.Config{}
+	repl(config)
 }

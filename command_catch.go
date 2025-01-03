@@ -16,10 +16,7 @@ func commandCatch(cfg *config, args ...string) error {
 	}
 
 	name := args[0]
-	//if slices.Contains(caughtPokemons, name) {
-	//	fmt.Println("This pokemon already caught")
-	//	return nil
-	//}
+
 	_, exists := cfg.caughtPokemon[name]
 	if exists {
 		fmt.Println("This pokemon already caught")
@@ -34,7 +31,6 @@ func commandCatch(cfg *config, args ...string) error {
 	catched := catchPokemon(pokemonExp)
 	if catched {
 		fmt.Printf("%s was caught!\n", name)
-		//caughtPokemons = append(caughtPokemons, name)
 		cfg.caughtPokemon[pokemon.Name] = pokemon
 		return nil
 	}
